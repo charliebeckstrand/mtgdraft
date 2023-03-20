@@ -6,7 +6,7 @@
 		class="
 			flex
 			items-center
-			space-x-1
+			space-x-2
 			bg-transparent
 			hover:bg-gray-100
 			hover:dark:bg-gray-800
