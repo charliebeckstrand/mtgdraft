@@ -48,6 +48,6 @@ function toggleDeckPanel() {
 
 <style scoped>
 .header {
-	min-height: 92px;
+	min-height: 90px;
 }
 </style>
