@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import { faker } from '@faker-js/faker'
 
 import Logo from '@/components/Logo.vue'
@@ -10,28 +10,44 @@ const randomName = faker.name.fullName()
 const randomEmail = faker.internet.email()
 const user = reactive({ name: randomName, email: randomEmail })
 
+const deckShown = ref(false)
+
 function login() {
 	user.id = 1
+}
+
+function toggleDeckPanel() {
+	deckShown.value = !deckShown.value
 }
 </script>
 
 <template>
-	<div class="flex items-center justify-between">
+	<div class="header flex items-center justify-between px-5 py-4 z-30">
 		<Logo />
 
-		<Button v-if="!user.id" @click="login">
-			<HeroIcon icon="ArrowDownLeftIcon" /> <span>Login</span>
-		</Button>
-		<Button v-else>
-			<div class="text-right">
-				<div class="font-black">{{ randomName }}</div>
-				<div class="text-sm text-gray-900 dark:text-gray-100">
-					{{ randomEmail }}
+		<div class="flex items-center space-x-2">
+			<!-- <Button icon @click="toggleDeckPanel">
+				<span>{{ deckShown ? 'Hide' : 'Show' }} Deck</span>
+			</Button> -->
+
+			<Button v-if="!user.id" @click="login">
+				<HeroIcon icon="ArrowDownLeftIcon" /> <span>Login</span>
+			</Button>
+			<Button v-else>
+				<div class="text-right">
+					<div class="font-black leading-none">{{ randomName }}</div>
+					<div class="text-sm text-gray-900 dark:text-gray-100">
+						{{ randomEmail }}
+					</div>
 				</div>
-			</div>
-			<HeroIcon icon="ChevronDownIcon" size="sm" />
-		</Button>
+				<HeroIcon icon="ChevronDownIcon" size="sm" />
+			</Button>
+		</div>
 	</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.header {
+	min-height: 86px;
+}
+</style>

@@ -14,7 +14,9 @@ if (Animal) {
 </script>
 
 <template>
-	<img :src="Animal" class="w-12" />
+	<router-link to="/">
+		<img :src="Animal" class="w-12 hover:scale-105" />
+	</router-link>
 </template>
 
 <style scoped></style>

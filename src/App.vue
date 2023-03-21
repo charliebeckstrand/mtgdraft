@@ -3,8 +3,26 @@ import Header from '@/components/Header.vue'
 </script>
 
 <template>
-	<div class="h-full dark:bg-gray-900 p-5">
-		<Header />
+	<div
+		class="
+			flex flex-col
+			h-screen
+			min-h-full
+			dark:bg-gray-900
+			dark:text-white
+		"
+	>
+		<div id="container" class="flex flex-col grow overflow-hidden">
+			<Header />
+
+			<div class="p-5 -mt-5 overflow-scroll">
+				<suspense>
+					<router-view v-slot="{ Component }">
+						<component :is="Component" />
+					</router-view>
+				</suspense>
+			</div>
+		</div>
 	</div>
 </template>
 
