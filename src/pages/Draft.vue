@@ -73,7 +73,7 @@ function pickCard(card) {
 				<template v-for="(card, index) in SortedCards" :key="index">
 					<Card
 						:card="card"
-						class="border-4"
+						class="border"
 						:class="{
 							'selected hover:grayscale-0 grayscale-0 border-white':
 								pickedCard.id == card.id,
