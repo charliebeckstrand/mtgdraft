@@ -15,7 +15,7 @@ import Header from '@/components/Header.vue'
 		<div id="container" class="flex flex-col grow overflow-hidden">
 			<Header />
 
-			<div class="p-5 -mt-5 overflow-scroll">
+			<div class="px-5 pb-5 overflow-scroll">
 				<suspense>
 					<router-view v-slot="{ Component }">
 						<component :is="Component" />

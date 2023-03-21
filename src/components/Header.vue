@@ -22,7 +22,7 @@ function toggleDeckPanel() {
 </script>
 
 <template>
-	<div class="header flex items-center justify-between px-5 py-4 z-30">
+	<div class="header flex items-center justify-between p-5">
 		<Logo />
 
 		<div class="flex items-center space-x-2">
@@ -48,6 +48,6 @@ function toggleDeckPanel() {
 
 <style scoped>
 .header {
-	min-height: 86px;
+	min-height: 92px;
 }
 </style>
