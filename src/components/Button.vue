@@ -32,13 +32,13 @@ const colorVariants = {
 			outline-0
 			focus:outline-none
 			focus:ring-0
-			transition-colors
+			transition-colors transition-transform
+			hover:scale-105
 		"
 		:class="[
 			{
 				'px-5': !props.icon,
 				'px-2.5': props.icon,
-				'hover:bg-opacity-90': props.color,
 				'hover:bg-gray-100 dark:hover:bg-gray-800': !props.color,
 			},
 			colorVariants[props.color],
