@@ -1,41 +1,57 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
+import { useSetsStore } from '@/stores/sets'
 
-const props = defineProps({
-	modelValue: {
-		type: String,
-		default: null,
-	},
+// const emit = defineEmits(['change'])
+
+const sets = useSetsStore()
+
+const state = reactive({
+	loading: false,
+	sets: [],
+	selectedSet: null,
 })
 
-const emit = defineEmits(['update:modelValue'])
+const fetchSets = async () => {
+	try {
+		const response = await fetch('https://api.scryfall.com/sets')
+		const data = await response.json()
 
-const selectedSet = computed({
-	get() {
-		return props.modelValue
-	},
-	set(newValue) {
-		emit('update:modelValue', newValue)
-	},
-})
-
-async function getSets(setCode) {
-	const response = await fetch(`https://api.scryfall.com/sets`)
-	const data = await response.json()
-
-	return data.data
+		if (response.ok) {
+			const coreSets = data.data.filter(
+				(set) => set.set_type == 'core' || set.set_type == 'expansion'
+			)
+			return coreSets
+		} else {
+			throw new Error(data.details || 'Error fetching core sets')
+		}
+	} catch (error) {
+		console.error('Error fetching core sets:', error)
+		return []
+	}
 }
 
-// const Sets = await getSets()
-const Sets = [
-	{ code: 'one', name: 'Phrexia: All Will Be One' },
-	{ code: 'mom', name: 'March of the Machines' },
-]
+onMounted(async () => {
+	if (sets.sets.length) {
+		state.sets = sets.sets
+		return false
+	}
+
+	state.loading = true
+
+	const response = await fetchSets()
+
+	state.sets = response
+
+	sets.setSets(response)
+
+	state.loading = false
+})
 </script>
 
 <template>
 	<select
-		v-model="selectedSet"
+		v-model="state.selectedSet"
 		class="
 			bg-gray-50
 			border border-gray-300
@@ -50,10 +66,20 @@ const Sets = [
 			dark:border-gray-600
 			dark:placeholder-gray-400
 			dark:text-white
+			w-64
+			text-ellipsis
 		"
+		:disabled="state.loading"
+		@change="$emit('change', state.selectedSet)"
 	>
-		<option selected disabled>Select Set</option>
-		<option v-for="(set, index) in Sets" :key="index" :value="set.code">
+		<option selected disabled value="null">
+			{{ state.loading ? 'Loading...' : 'Select Set' }}
+		</option>
+		<option
+			v-for="(set, index) in state.sets"
+			:key="index"
+			:value="set.code"
+		>
 			{{ set.name }}
 		</option>
 	</select>

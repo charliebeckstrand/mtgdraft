@@ -8,7 +8,9 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@headlessui/vue": "^1.7.12",
 		"@heroicons/vue": "^2.0.16",
+		"pinia": "^2.0.33",
 		"vue": "^3.2.47",
 		"vue-router": "^4.1.6"
 	},

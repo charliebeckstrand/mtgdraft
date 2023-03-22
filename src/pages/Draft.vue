@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted, ref, reactive, watch, watchEffect } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { findIndex } from 'lodash'
 
-import SetSelect from '@/components/SetSelect.vue'
+import Header from '@/components/Header.vue'
 import Button from '@/components/Button.vue'
 import HeroIcon from '@/components/HeroIcon.vue'
 import Card from '@/components/Card.vue'
@@ -11,7 +11,13 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 
-async function getCards(setCode) {
+const state = reactive({
+	cards: [],
+	deck: [],
+	pickedCard: {},
+})
+
+const getCards = async (setCode) => {
 	const response = await fetch(
 		`https://api.scryfall.com/cards/search?q=set:${setCode}`
 	)
@@ -21,10 +27,7 @@ async function getCards(setCode) {
 	return data.data
 }
 
-const Cards = reactive(await getCards(route.params.set))
-const SortedCards = sortByProperty(Cards, 'color_identity')
-
-function sortByProperty(array, property) {
+const sortByProperty = (array, property) => {
 	return array.sort((a, b) => {
 		if (a[property] < b[property]) {
 			return -1
@@ -36,70 +39,93 @@ function sortByProperty(array, property) {
 	})
 }
 
-let pickedCard = reactive({})
-
-function selectCard(card) {
-	pickedCard.id = pickedCard.id !== card.id ? card.id : null
+const selectCard = (card) => {
+	state.pickedCard.id = state.pickedCard.id !== card.id ? card.id : null
 }
 
-const Deck = reactive([])
+const pickCard = (card) => {
+	const cardId = card && card.id ? card.id : state.pickedCard.id
+	const cardIndex = findIndex(state.cards, { id: cardId })
 
-function pickCard(card) {
-	const cardId = card && card.id ? card.id : pickedCard.id
-	const cardIndex = findIndex(Cards, { id: cardId })
+	state.deck.push(cardId)
+	state.cards.splice(cardIndex, 1)
 
-	Deck.push(cardId)
-	Cards.splice(cardIndex, 1)
-
-	pickedCard.id = null
+	state.pickedCard.id = null
 }
+
+onMounted(async () => {
+	const response = await getCards(route.params.set)
+
+	state.cards = sortByProperty(response, 'color_identity')
+})
 </script>
 
 <template>
-	<div class="flex flex-col space-y-5 overflow-scroll grow">
-		<div class="grid flex-grow">
+	<div class="flex flex-col grow overflow-hidden">
+		<Header />
+
+		<div class="px-5 pb-5 overflow-scroll">
+			<div class="flex flex-col space-y-5 overflow-scroll grow">
+				<div class="grid flex-grow">
+					<div
+						class="
+							cards
+							grid
+							xl:grid-cols-6
+							lg:grid-cols-5
+							md:grid-cols-4
+							sm:grid-cols-3
+							grid-cols-2
+							gap-4
+						"
+					>
+						<template
+							v-for="(card, index) in state.cards"
+							:key="index"
+						>
+							<Card
+								:card="card"
+								:class="{
+									'selected hover:grayscale-0 grayscale-0':
+										state.pickedCard.id == card.id,
+									'': state.pickedCard.id !== card.id,
+									'opacity-20 hover:opacity-100 grayscale hover:grayscale-0':
+										state.pickedCard.id &&
+										state.pickedCard.id !== card.id,
+								}"
+								@click="selectCard(card)"
+								@esc="state.pickedCard.id = null"
+							/>
+						</template>
+					</div>
+				</div>
+			</div>
+
 			<div
 				class="
-					cards
-					grid
-					xl:grid-cols-6
-					lg:grid-cols-5
-					md:grid-cols-4
-					sm:grid-cols-3
-					grid-cols-2
-					gap-4
+					fixed
+					bottom-7
+					right-7
+					z-30
+					transition
+					duration-100
+					origin-right
 				"
+				:class="{
+					'scale-100': state.pickedCard.id,
+					'scale-0': !state.pickedCard.id,
+				}"
 			>
-				<template v-for="(card, index) in SortedCards" :key="index">
-					<Card
-						:card="card"
-						class="border"
-						:class="{
-							'selected hover:grayscale-0 grayscale-0 border-white':
-								pickedCard.id == card.id,
-							'border-transparent': pickedCard.id !== card.id,
-							'opacity-20 hover:opacity-100 grayscale hover:grayscale-0':
-								pickedCard.id && pickedCard.id !== card.id,
-						}"
-						@click="selectCard(card)"
-						@esc="pickedCard.id = null"
-					/>
-				</template>
+				<Button
+					color="white"
+					class="font-bold shadow-xl"
+					@click="pickCard"
+				>
+					<span>Pick Card</span>
+					<HeroIcon icon="ChevronRightIcon" />
+				</Button>
 			</div>
 		</div>
-	</div>
-
-	<div
-		class="fixed bottom-7 right-7 z-30 transition duration-100 origin-right"
-		:class="{
-			'scale-100': pickedCard.id,
-			'scale-0': !pickedCard.id,
-		}"
-	>
-		<Button color="white" class="font-bold shadow-xl" @click="pickCard">
-			<span>Pick Card</span>
-			<HeroIcon icon="ChevronRightIcon" />
-		</Button>
 	</div>
 </template>
 

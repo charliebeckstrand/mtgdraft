@@ -12,17 +12,7 @@ import Header from '@/components/Header.vue'
 			dark:text-white
 		"
 	>
-		<div id="container" class="flex flex-col grow overflow-hidden">
-			<Header />
-
-			<div class="px-5 pb-5 overflow-scroll">
-				<suspense>
-					<router-view v-slot="{ Component }">
-						<component :is="Component" />
-					</router-view>
-				</suspense>
-			</div>
-		</div>
+		<router-view />
 	</div>
 </template>
 
